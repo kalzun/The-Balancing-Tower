@@ -25,6 +25,9 @@ public class SpawnerScript : MonoBehaviour
 	// Increases to 1 when spawning, cannot spawn if more. Decrease when object dropped
 	public int blocksSpawned = 0;
 
+	// For lerping up and down:
+	private float originalPositionY;
+	private float newPosition;
 
 	void Start()
 	{
@@ -164,22 +167,60 @@ public class SpawnerScript : MonoBehaviour
 
 	public void MoveUp()
 	{
-		float originalPositionY = transform.position.y;
-		float newPosition = originalPositionY + spawnPointMoveAmount;
-		Vector3 movePosition = new Vector3 (0, (Mathf.Lerp (originalPositionY, newPosition, cameraScrollSpeed * Time.deltaTime)),0);
-		transform.position = movePosition;
+		originalPositionY = transform.position.y;
+		newPosition = originalPositionY + spawnPointMoveAmount;
+		StartCoroutine ("LerpUp");
+		// Vector3 movePosition = new Vector3 (0, (Mathf.Lerp (originalPositionY, newPosition, cameraScrollSpeed * Time.deltaTime)),0);
+		// transform.position = movePosition;
 	}
 
 
 	public void MoveDown()
 	{
 
-		float originalPositionY = transform.position.y;
-		float newPosition = originalPositionY - spawnPointMoveAmount;
-		Vector3 movePosition = new Vector3 (0, (Mathf.Lerp (originalPositionY, newPosition, cameraScrollSpeed * Time.deltaTime)), 0);
-		transform.position = movePosition;
+		originalPositionY = transform.position.y;
+		newPosition = originalPositionY - spawnPointMoveAmount;
+		StartCoroutine ("LerpDown");
+		// Vector3 movePosition = new Vector3 (0, (Mathf.Lerp (originalPositionY, newPosition, cameraScrollSpeed * Time.deltaTime)), 0);
+		// transform.position = movePosition;
 	}
 
+	IEnumerator LerpUp() 
+	{
+		for (float t = 0.0f; t < 1.0f; t += Time.deltaTime / 4) 
+		{	
+			//s is a smoothed t
+			float s = Mathf.SmoothStep (0.0f, 1.0f, t);
+			//Spherical linear interpolation (Slerp) will give us a better rotation
+			//if the rotations are far apart
+			transform.position = new Vector3(transform.position.x, (Mathf.Lerp (originalPositionY, newPosition, s)), transform.position.z);
+			// mainCam.transform.position = new Vector3(oldPosition.x, oldPosition.y, (Mathf.Lerp (mainCam.transform.position.z, newPositionZ, s)));
+			
+			// Instantiate (endParticles, mainCam.transform.position, mainCam.transform.rotation);
+			
+			// yield return new WaitForSeconds(6);
+			
+			yield return null;
+		}
+	}
+
+	IEnumerator LerpDown() 
+	{
+		for (float t = 0.0f; t < 1.0f; t += Time.deltaTime / 4) 
+		{	
+			//s is a smoothed t
+			float s = Mathf.SmoothStep (0.0f, 1.0f, t);
+			//Spherical linear interpolation (Slerp) will give us a better rotation
+			//if the rotations are far apart
+			transform.position = new Vector3(transform.position.x, (Mathf.Lerp (originalPositionY, newPosition, s)), transform.position.z);
+			
+			// Instantiate (endParticles, mainCam.transform.position, mainCam.transform.rotation);
+			
+			// yield return new WaitForSeconds(6);
+			
+			yield return null;
+		}
+	}
 
 
 }
